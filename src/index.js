@@ -15,5 +15,5 @@ export default (pathFile1, pathFile2) => {
   }, '');
   const resultStr = Object.entries(objAfter)
     .reduce((acc, [key, value]) => ((_.has(objBefore, key)) ? acc : `${acc}\n+${key}: ${value}`), str);
-  console.log(resultStr);
+  console.log(`{\n${resultStr}\n}`);
 };
