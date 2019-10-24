@@ -1,4 +1,5 @@
-const fs = require('fs');
+import parse from './parsers';
+
 const _ = require('lodash');
 
 const arrayActions = [
@@ -16,15 +17,15 @@ const arrayActions = [
   },
 ];
 const getAction = (obj, key, value) => arrayActions.find(({ check }) => check(obj, key, value));
-export default (pathFile1, pathFile2) => {
-  const objBefore = JSON.parse(fs.readFileSync(pathFile1, 'utf8'));
-  const objAfter = JSON.parse(fs.readFileSync(pathFile2, 'utf8'));
+export default (filePath1, filePath2) => {
+  const objBefore = parse(filePath1);
+  const objAfter = parse(filePath2);
   const startString = Object.entries(objBefore).reduce((acc, [key, value]) => {
     const { action } = getAction(objAfter, key, value);
     return `${acc}\n${action(objAfter, key, value)}`;
   }, '');
   const resultString = Object.entries(objAfter)
     .reduce((acc, [key, value]) => ((_.has(objBefore, key)) ? acc : `${acc}\n+${key}: ${value}`), startString);
-  // console.log(`{${resultString}\n}`);
+  console.log(`{${resultString}\n}`);
   return `{${resultString}\n}\n`;
 };
