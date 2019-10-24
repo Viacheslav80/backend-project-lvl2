@@ -1,8 +1,9 @@
 import yaml from 'js-yaml';
+//  import ini from 'ini';
 
 const fs = require('fs');
 const path = require('path');
-// const ini = require('ini');
+const ini = require('ini');
 
 const arrayParsers = [
   {
@@ -12,6 +13,10 @@ const arrayParsers = [
   {
     parser: yaml.safeLoad,
     check: (type) => type === '.yml',
+  },
+  {
+    parser: ini.parse,
+    check: (type) => type === '.ini',
   },
 ];
 const getParser = (extname) => {

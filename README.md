@@ -32,3 +32,10 @@ $ gendiff <any_file>.yml  <any_file>.yml
 ```
 
 ![](gif/gendiff_2.gif)
+
+```
+$ gendiff <any_file>.ini  <any_file>.ini
+```
+
+![](gif/gendiff_3.gif)
+
