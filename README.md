@@ -22,20 +22,28 @@ $ uses_folder/npm link
 Use to compare:
 
 ```
-$ gendiff <any_file>.json  <any_file>.json 
+$ gendiff <any_file>.json  <any_file2>.json 
 ```
 
 ![](gif/gendiff_1.gif)
 
 ```
-$ gendiff <any_file>.yml  <any_file>.yml
+$ gendiff <any_file>.yml  <any_file2>.yml
 ```
 
 ![](gif/gendiff_2.gif)
 
 ```
-$ gendiff <any_file>.ini  <any_file>.ini
+$ gendiff <any_file>.ini  <any_file2>.ini
 ```
 
 ![](gif/gendiff_3.gif)
+
+Compare deep files:
+
+```
+$ gendiff <deep_file>.json <dep_file2>.json
+```
+
+![](gif/gendiff_4.gif)
 

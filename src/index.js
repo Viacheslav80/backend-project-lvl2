@@ -47,6 +47,6 @@ export default (filePath1, filePath2) => {
   };
   const resultAst = iter(objBefore, objAfter);
   //  console.log(JSON.stringify(resultAst, null, 2));
-  //  console.log(render(resultAst));
+  console.log(render(resultAst));
   return render(resultAst);
 };
