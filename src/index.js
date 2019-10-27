@@ -1,31 +1,52 @@
 import parse from './parsers';
+import render from './render';
 
 const _ = require('lodash');
 
-const arrayActions = [
+const arrayStatuses = [
   {
     check: (obj, key) => !_.has(obj, key),
-    action: (obj, key, value) => `-${key}: ${value}`,
+    status: 'deleted',
   },
   {
     check: (obj, key, value) => value === obj[key],
-    action: (obj, key, value) => `${key}: ${value}`,
+    status: 'no changed',
   },
   {
     check: (obj, key, value) => value !== obj[key],
-    action: (obj, key, value) => `-${key}: ${value}\n+${key}: ${obj[key]}`,
+    status: 'changed',
   },
 ];
-const getAction = (obj, key, value) => arrayActions.find(({ check }) => check(obj, key, value));
+const getStatus = (obj, key, value) => arrayStatuses.find(({ check }) => check(obj, key, value));
+const isObject = (item) => item instanceof Object;
 export default (filePath1, filePath2) => {
   const objBefore = parse(filePath1);
   const objAfter = parse(filePath2);
-  const startString = Object.entries(objBefore).reduce((acc, [key, value]) => {
-    const { action } = getAction(objAfter, key, value);
-    return `${acc}\n${action(objAfter, key, value)}`;
-  }, '');
-  const resultString = Object.entries(objAfter)
-    .reduce((acc, [key, value]) => ((_.has(objBefore, key)) ? acc : `${acc}\n+${key}: ${value}`), startString);
-  console.log(`{${resultString}\n}`);
-  return `{${resultString}\n}\n`;
+  const iter = (before, after) => {
+    const array = Object.entries(before).reduce((acc, [key, value]) => {
+      const item = {
+        name: key,
+        status: getStatus(after, key, value).status,
+        value,
+        newValue: '',
+        children: (isObject(value) && isObject(after[key])) ? iter(value, after[key]) : [],
+      };
+      item.newValue = (item.status === 'changed') ? after[key] : '';
+      return [...acc, item];
+    }, []);
+    //  console.log(array);
+    const resultArray = Object.entries(after)
+      .reduce((acc, [key, value]) => (_.has(before, key) ? acc : [...acc, {
+        name: key,
+        status: 'add',
+        value,
+        newValue: '',
+        children: [],
+      }]), array);
+    return resultArray;
+  };
+  const resultAst = iter(objBefore, objAfter);
+  //  console.log(JSON.stringify(resultAst, null, 2));
+  //  console.log(render(resultAst));
+  return render(resultAst);
 };

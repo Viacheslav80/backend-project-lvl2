@@ -9,3 +9,7 @@ test.each([[`${path}before.json`, `${path}after.json`],
   [`${path}before.ini`, `${path}after.ini`]])('gendiff', (file1, file2) => {
   expect(gendiff(file1, file2)).toEqual(str);
 });
+const str2 = fs.readFileSync(`${path}differences_2.md`, 'utf8');
+test('deepObject', () => {
+  expect(gendiff(`${path}beforeDeep.json`, `${path}afterDeep.json`)).toEqual(str2);
+});
