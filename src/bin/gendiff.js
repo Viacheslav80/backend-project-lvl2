@@ -5,11 +5,11 @@ import compareFile from '..';
 const program = require('commander');
 
 program
-  .version('1.2.1', '-v, --version', 'output the current version')
-  .option('-f, --format [type]', 'Output format', 'json')
+  .version('1.3.0', '-v, --version', 'output the current version')
+  .option('-f, --format [type]', 'Output format', 'deep')
   .description('Compares two configuration files and shows a differences.')
   .arguments('<firstConfig> <secondConfig>')
-  .action((firstFile, secondFile) => {
-    compareFile(firstFile, secondFile);
+  .action((firstFile, secondFile, options) => {
+    compareFile(firstFile, secondFile, options.format);
   });
 program.parse(process.argv);

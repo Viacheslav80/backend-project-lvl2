@@ -1,9 +1,20 @@
 import parse from './parsers';
-import render from './render';
+import deeper from './formatters/deeper';
+import plain from './formatters/plain';
 
 const _ = require('lodash');
 
-const arrayStatuses = [
+const renderers = [
+  {
+    check: (valueFormat) => valueFormat === 'deep',
+    renderer: deeper,
+  },
+  {
+    check: (valueFormat) => valueFormat === 'plain',
+    renderer: plain,
+  },
+];
+const statuses = [
   {
     check: (obj, key) => !_.has(obj, key),
     status: 'deleted',
@@ -17,9 +28,10 @@ const arrayStatuses = [
     status: 'changed',
   },
 ];
-const getStatus = (obj, key, value) => arrayStatuses.find(({ check }) => check(obj, key, value));
+const getRenderer = (format) => renderers.find(({ check }) => check(format));
+const getStatus = (obj, key, value) => statuses.find(({ check }) => check(obj, key, value));
 const isObject = (item) => item instanceof Object;
-export default (filePath1, filePath2) => {
+export default (filePath1, filePath2, format = 'deep') => {
   const objBefore = parse(filePath1);
   const objAfter = parse(filePath2);
   const iter = (before, after) => {
@@ -46,7 +58,8 @@ export default (filePath1, filePath2) => {
     return resultArray;
   };
   const resultAst = iter(objBefore, objAfter);
-  //  console.log(JSON.stringify(resultAst, null, 2));
-  console.log(render(resultAst));
-  return render(resultAst);
+  // console.log(JSON.stringify(resultAst, null, 2));
+  const { renderer } = getRenderer(format);
+  console.log(renderer(resultAst));
+  return renderer(resultAst);
 };
