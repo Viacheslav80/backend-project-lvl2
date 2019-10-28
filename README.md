@@ -42,8 +42,15 @@ $ gendiff <any_file>.ini  <any_file2>.ini
 Compare deep files:
 
 ```
-$ gendiff <deep_file>.json <dep_file2>.json
+$ gendiff <any_deep_file>.json <any_deep_file2>.json
 ```
 
 ![](gif/gendiff_4.gif)
 
+Output format may be change:
+
+```
+$ gendiff --format plain <any_file>.json  <any_file2>.json 
+```
+
+![](gif/gendiff_5.gif)
