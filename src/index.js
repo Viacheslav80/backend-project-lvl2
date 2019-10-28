@@ -6,12 +6,16 @@ const _ = require('lodash');
 
 const renderers = [
   {
-    check: (valueFormat) => valueFormat === 'deep',
+    format: 'deep',
     renderer: deeper,
   },
   {
-    check: (valueFormat) => valueFormat === 'plain',
+    format: 'plain',
     renderer: plain,
+  },
+  {
+    format: 'json',
+    renderer: JSON.stringify,
   },
 ];
 const statuses = [
@@ -28,7 +32,8 @@ const statuses = [
     status: 'changed',
   },
 ];
-const getRenderer = (format) => renderers.find(({ check }) => check(format));
+const getRenderer = (requiredFormat) => renderers
+  .find(({ format }) => requiredFormat === format);
 const getStatus = (obj, key, value) => statuses.find(({ check }) => check(obj, key, value));
 const isObject = (item) => item instanceof Object;
 export default (filePath1, filePath2, format = 'deep') => {
@@ -61,5 +66,5 @@ export default (filePath1, filePath2, format = 'deep') => {
   // console.log(JSON.stringify(resultAst, null, 2));
   const { renderer } = getRenderer(format);
   console.log(renderer(resultAst));
-  return renderer(resultAst);
+  return `${renderer(resultAst)}\n`;
 };

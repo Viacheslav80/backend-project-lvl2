@@ -54,3 +54,14 @@ $ gendiff --format plain <any_file>.json  <any_file2>.json
 ```
 
 ![](gif/gendiff_5.gif)
+
+Output JSON format:
+
+```
+$ gendiff --format json <any_file>.json  <any_file2>.json 
+```
+
+![](gif/gendiff_6.gif)
+
+
+

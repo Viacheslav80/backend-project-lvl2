@@ -31,5 +31,5 @@ export default (ast) => {
     }, []);
     return stringArray.join('\n');
   };
-  return `${iter(ast)}\n`;
+  return iter(ast);
 };

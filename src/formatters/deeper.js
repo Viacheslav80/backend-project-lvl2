@@ -38,5 +38,5 @@ export default (ast) => {
     }, '');
     return `{${resultString}\n${' '.repeat(5 * (level - 1))}}`;
   };
-  return `${iter(ast)}\n`;
+  return iter(ast);
 };
