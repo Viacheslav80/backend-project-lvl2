@@ -18,49 +18,55 @@ const renderers = [
     renderer: JSON.stringify,
   },
 ];
+const isObject = (item) => item instanceof Object;
 const statuses = [
   {
-    check: (obj, key) => !_.has(obj, key),
+    check: (before, after, key) => !(_.has(after, key)),
     status: 'deleted',
+    action: (before, after, func) => (func ? [] : before),
   },
   {
-    check: (obj, key, value) => value === obj[key],
+    check: (before, after, key) => (isObject(before[key]) && isObject(after[key])),
+    status: 'haveChildren',
+    action: (before, after, func) => (func ? func(before, after) : before),
+  },
+  {
+    check: (before, after, key) => before[key] === after[key],
     status: 'no changed',
+    action: (before, after, func) => (func ? [] : before),
   },
   {
-    check: (obj, key, value) => value !== obj[key],
+    check: (before, after, key) => !(_.has(before, key)),
+    status: 'add',
+    action: (before, after, func) => (func ? [] : after),
+  },
+  {
+    check: (before, after, key) => before[key] !== after[key],
     status: 'changed',
+    action: (before, after, func) => (func ? [] : before),
   },
 ];
 const getRenderer = (requiredFormat) => renderers
   .find(({ format }) => requiredFormat === format);
-const getStatus = (obj, key, value) => statuses.find(({ check }) => check(obj, key, value));
-const isObject = (item) => item instanceof Object;
+const getActionAndStatus = (before, after, key) => statuses
+  .find(({ check }) => check(before, after, key));
 export default (filePath1, filePath2, format = 'deep') => {
   const objBefore = parse(filePath1);
   const objAfter = parse(filePath2);
   const iter = (before, after) => {
-    const array = Object.entries(before).reduce((acc, [key, value]) => {
-      const item = {
+    const allKeys = _.union(Object.keys(before), Object.keys(after));
+    const ast = allKeys.map((key) => {
+      const { status, action } = getActionAndStatus(before, after, key);
+      const itemAst = {
         name: key,
-        status: getStatus(after, key, value).status,
-        value,
-        newValue: '',
-        children: (isObject(value) && isObject(after[key])) ? iter(value, after[key]) : [],
+        status,
+        value: action(before[key], after[key]),
+        newValue: status === 'changed' ? after[key] : '',
+        children: action(before[key], after[key], iter),
       };
-      item.newValue = (item.status === 'changed') ? after[key] : '';
-      return [...acc, item];
+      return itemAst;
     }, []);
-    //  console.log(array);
-    const resultArray = Object.entries(after)
-      .reduce((acc, [key, value]) => (_.has(before, key) ? acc : [...acc, {
-        name: key,
-        status: 'add',
-        value,
-        newValue: '',
-        children: [],
-      }]), array);
-    return resultArray;
+    return ast;
   };
   const resultAst = iter(objBefore, objAfter);
   // console.log(JSON.stringify(resultAst, null, 2));
