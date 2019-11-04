@@ -10,8 +10,8 @@ test.each([[`${path}before.json`, `${path}after.json`, text],
   [`${path}before.yml`, `${path}after.yml`, text],
   [`${path}before.ini`, `${path}after.ini`, text],
   [`${path}beforeDeep.json`, `${path}afterDeep.json`, textDeep],
-])('gendiff', (pathFile1, pathFile2, string) => {
-  expect(gendiff(pathFile1, pathFile2)).toEqual(string);
+])('gendiff', (pathFile1, pathFile2, text) => {
+  expect(gendiff(pathFile1, pathFile2)).toEqual(text);
 });
 test.each([['plain', textPlain], ['json', textJson],
 ])('gendiff_output_plain_and_json', (format, text) => {
