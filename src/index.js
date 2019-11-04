@@ -1,7 +1,7 @@
+import _ from 'lodash';
 import parse from './parsers';
 import deeper from './formatters/deeper';
 import plain from './formatters/plain';
-import _ from 'lodash';
 
 const renderers = [
   {
