@@ -1,8 +1,7 @@
 import parse from './parsers';
 import deeper from './formatters/deeper';
 import plain from './formatters/plain';
-
-const _ = require('lodash');
+import _ from 'lodash';
 
 const renderers = [
   {
@@ -60,7 +59,7 @@ export default (filePath1, filePath2, format = 'deep') => {
       const itemAst = {
         name: key,
         status,
-        value: action(before[key], after[key]),
+        oldValue: action(before[key], after[key]),
         newValue: status === 'changed' ? after[key] : '',
         children: action(before[key], after[key], iter),
       };

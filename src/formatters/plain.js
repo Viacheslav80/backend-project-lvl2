@@ -24,7 +24,7 @@ export default (ast) => {
         return [...acc, iter(children, name)];
       }
       if (status === 'no changed') return acc;
-      const value = isObject(objAst.value) ? '[complex value]' : objAst.value;
+      const value = isObject(objAst.oldValue) ? '[complex value]' : objAst.oldValue;
       const newValue = isObject(objAst.newValue) ? '[complex value]' : objAst.newValue;
       const string = getString(status)(name, value, newValue);
       return [...acc, string];

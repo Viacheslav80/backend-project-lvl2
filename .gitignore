@@ -4,6 +4,3 @@
 dist
 .tern-port
 .idea
-*.json
-*.ini
-*.yml
