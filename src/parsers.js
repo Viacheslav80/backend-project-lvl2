@@ -17,13 +17,14 @@ const arrayParsers = [
     check: (type) => type === '.ini',
   },
 ];
+const getData = (filePath) => fs.readFileSync(filePath, 'utf8');
 const getParser = (extname) => {
   const { parser } = arrayParsers.find(({ check }) => check(extname));
   return parser;
 };
 export default (filePath) => {
+  const data = getData(filePath);
   const ext = path.extname(filePath);
-  const data = fs.readFileSync(filePath, 'utf8');
   const parse = getParser(ext);
   return parse(data);
 };
