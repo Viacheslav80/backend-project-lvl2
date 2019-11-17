@@ -3,28 +3,16 @@ import ini from 'ini';
 import fs from 'fs';
 import path from 'path';
 
-const arrayParsers = [
-  {
-    parser: JSON.parse,
-    check: (type) => (type === '.json') || (type === ''),
-  },
-  {
-    parser: yaml.safeLoad,
-    check: (type) => type === '.yml',
-  },
-  {
-    parser: ini.parse,
-    check: (type) => type === '.ini',
-  },
-];
-const getData = (filePath) => fs.readFileSync(filePath, 'utf8');
-const getParser = (extname) => {
-  const { parser } = arrayParsers.find(({ check }) => check(extname));
-  return parser;
+const mapping = {
+  json: JSON.parse,
+  yaml: yaml.safeLoad,
+  ini: ini.parse,
 };
+const getData = (filePath) => fs.readFileSync(filePath, 'utf8');
+const parse = (type, data) => mapping[type](data);
+
 export default (filePath) => {
   const data = getData(filePath);
-  const ext = path.extname(filePath);
-  const parse = getParser(ext);
-  return parse(data);
+  const type = path.extname(filePath).slice(1);
+  return parse(type, data);
 };
