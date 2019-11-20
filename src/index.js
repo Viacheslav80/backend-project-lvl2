@@ -3,51 +3,50 @@ import parse from './parsers';
 import deeper from './formatters/deeper';
 import plain from './formatters/plain';
 
-const renderers = [
-  {
-    format: 'deep',
-    renderer: deeper,
-  },
-  {
-    format: 'plain',
-    renderer: plain,
-  },
-  {
-    format: 'json',
-    renderer: JSON.stringify,
-  },
-];
+const renderer = {
+  deep: deeper,
+  plain,
+  json: JSON.stringify,
+};
 const isObject = (item) => item instanceof Object;
 const statuses = [
   {
     check: (before, after, key) => !(_.has(after, key)),
     status: 'deleted',
-    action: (before, after, func) => (func ? [] : before),
+    getChildren: () => [],
+    getValue: _.identity,
+    getNewValue: () => '',
   },
   {
     check: (before, after, key) => (isObject(before[key]) && isObject(after[key])),
     status: 'haveChildren',
-    action: (before, after, func) => (func ? func(before, after) : before),
+    getChildren: (before, after, func) => func(before, after),
+    getValue: _.identity,
+    getNewValue: _.identity,
   },
   {
     check: (before, after, key) => before[key] === after[key],
-    status: 'no changed',
-    action: (before, after, func) => (func ? [] : before),
+    status: 'no_changed',
+    getChildren: () => [],
+    getValue: _.identity,
+    getNewValue: () => '',
   },
   {
     check: (before, after, key) => !(_.has(before, key)),
     status: 'add',
-    action: (before, after, func) => (func ? [] : after),
+    getChildren: () => [],
+    getValue: (before, after) => after,
+    getNewValue: () => '',
   },
   {
     check: (before, after, key) => before[key] !== after[key],
     status: 'changed',
-    action: (before, after, func) => (func ? [] : before),
+    getChildren: () => [],
+    getValue: _.identity,
+    getNewValue: _.identity,
   },
 ];
-const getRenderer = (requiredFormat) => renderers
-  .find(({ format }) => requiredFormat === format);
-const getActionAndStatus = (before, after, key) => statuses
+const getProperties = (before, after, key) => statuses
   .find(({ check }) => check(before, after, key));
 export default (filePath1, filePath2, format = 'deep') => {
   const objBefore = parse(filePath1);
@@ -55,13 +54,13 @@ export default (filePath1, filePath2, format = 'deep') => {
   const iter = (before, after) => {
     const allKeys = _.union(Object.keys(before), Object.keys(after));
     const ast = allKeys.map((key) => {
-      const { status, action } = getActionAndStatus(before, after, key);
+      const current = getProperties(before, after, key);
       const itemAst = {
         name: key,
-        status,
-        oldValue: action(before[key], after[key]),
-        newValue: status === 'changed' ? after[key] : '',
-        children: action(before[key], after[key], iter),
+        status: current.status,
+        oldValue: current.getValue(before[key], after[key]),
+        newValue: current.getNewValue(after[key]),
+        children: current.getChildren(before[key], after[key], iter),
       };
       return itemAst;
     }, []);
@@ -69,7 +68,6 @@ export default (filePath1, filePath2, format = 'deep') => {
   };
   const resultAst = iter(objBefore, objAfter);
   // console.log(JSON.stringify(resultAst, null, 2));
-  const { renderer } = getRenderer(format);
-  console.log(renderer(resultAst));
-  return `${renderer(resultAst)}\n`;
+  console.log(renderer[format](resultAst));
+  return renderer[format](resultAst);
 };

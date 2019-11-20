@@ -1,32 +1,24 @@
 const isObject = (value) => value instanceof Object;
-const stringsAndStatuses = [
-  {
-    status: 'add',
-    string: (name, value) => `Property '${name}' was added with value: ${value}`,
-  },
-  {
-    status: 'changed',
-    string: (name, value, newValue) => `Property '${name}' was updated. From ${value} to ${newValue}`,
-  },
-  {
-    status: 'deleted',
-    string: (name) => `Property '${name}' was removed`,
-  },
-];
-const getString = (valueStatus) => stringsAndStatuses
-  .find(({ status }) => valueStatus === status).string;
+const statuses = {
+  add: (name, value) => `Property '${name}' was added with value: ${value}`,
+  changed: (name, value, newValue) => `Property '${name}' was updated. From ${value} to ${newValue}`,
+  deleted: (name) => `Property '${name}' was removed`,
+};
+
 export default (ast) => {
   const iter = (treeAst, namePath) => {
-    const stringArray = treeAst.reduce((acc, objAst) => {
-      const { status, children } = objAst;
-      const name = (namePath) ? `${namePath}.${objAst.name}` : objAst.name;
-      if (children.length !== 0) {
+    const stringArray = treeAst.reduce((acc, itemAst) => {
+      const { status, children } = itemAst;
+      const name = (namePath) ? `${namePath}.${itemAst.name}` : itemAst.name;
+      if (status === 'haveChildren') {
         return [...acc, iter(children, name)];
       }
-      if (status === 'no changed') return acc;
-      const value = isObject(objAst.oldValue) ? '[complex value]' : objAst.oldValue;
-      const newValue = isObject(objAst.newValue) ? '[complex value]' : objAst.newValue;
-      const string = getString(status)(name, value, newValue);
+      if (status === 'no_changed') {
+        return acc;
+      }
+      const value = isObject(itemAst.oldValue) ? '[complex value]' : itemAst.oldValue;
+      const newValue = isObject(itemAst.newValue) ? '[complex value]' : itemAst.newValue;
+      const string = statuses[status](name, value, newValue);
       return [...acc, string];
     }, []);
     return stringArray.join('\n');

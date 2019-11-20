@@ -5,7 +5,7 @@ import path from 'path';
 
 const mapping = {
   json: JSON.parse,
-  yaml: yaml.safeLoad,
+  yml: yaml.safeLoad,
   ini: ini.parse,
 };
 const getData = (filePath) => fs.readFileSync(filePath, 'utf8');
