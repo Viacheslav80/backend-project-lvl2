@@ -68,6 +68,6 @@ export default (filePath1, filePath2, format = 'deep') => {
   };
   const resultAst = iter(objBefore, objAfter);
   // console.log(JSON.stringify(resultAst, null, 2));
-  console.log(renderer[format](resultAst));
+  // console.log(renderer[format](resultAst));
   return renderer[format](resultAst);
 };
