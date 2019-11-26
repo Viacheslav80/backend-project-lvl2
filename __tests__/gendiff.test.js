@@ -7,8 +7,7 @@ const name = 'SimpleTextDifferences';
 const getFixturePath = (nameFile) => path.join(__dirname, '..', '__fixtures__', nameFile);
 const getResult = (nameFile) => fs.readFileSync(getFixturePath(nameFile), 'utf8').trim();
 
-test.each([['before.json', 'after.json', name],
-  ['before.yml', 'after.yml', name],
+test.each([['before.yml', 'after.yml', name],
   ['before.ini', 'after.ini', name],
   ['beforeDeep.json', 'afterDeep.json', 'DeepTextDifferences'],
 ])('gendiff', (fileBefore, fileAfter, fileResult) => {
