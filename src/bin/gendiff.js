@@ -5,7 +5,7 @@ import compareFile from '..';
 const program = require('commander');
 
 program
-  .version('1.5.5', '-v, --version', 'output the current version')
+  .version('1.5.6', '-v, --version', 'output the current version')
   .option('-f, --format [type]', 'Output format', 'deep')
   .description('Compares two configuration files and shows a differences.')
   .arguments('<firstConfig> <secondConfig>')

@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import fs from 'fs';
+import path from 'path';
 import parse from './parsers';
 import deeper from './formatters/deeper';
 import plain from './formatters/plain';
@@ -49,10 +50,11 @@ const statuses = [
 ];
 const getProperties = (before, after, key) => statuses
   .find(({ check }) => check(before, after, key));
+const getType = (filePath) => path.extname(filePath).slice(1);
+const getText = (filePath) => fs.readFileSync(filePath, 'utf8');
 export default (filePath1, filePath2, format = 'deep') => {
-  const getText = (filePath) => fs.readFileSync(filePath, 'utf8');
-  const objBefore = parse(getText(filePath1), filePath1);
-  const objAfter = parse(getText(filePath2), filePath2);
+  const objBefore = parse(getText(filePath1), getType(filePath1));
+  const objAfter = parse(getText(filePath2), getType(filePath2));
   const iter = (before, after) => {
     const allKeys = _.union(Object.keys(before), Object.keys(after));
     const ast = allKeys.map((key) => {
