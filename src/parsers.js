@@ -1,6 +1,5 @@
 import yaml from 'js-yaml';
 import ini from 'ini';
-import fs from 'fs';
 import path from 'path';
 
 const mapping = {
@@ -8,11 +7,8 @@ const mapping = {
   yml: yaml.safeLoad,
   ini: ini.parse,
 };
-const getData = (filePath) => fs.readFileSync(filePath, 'utf8');
 const parse = (type, data) => mapping[type](data);
-
-export default (filePath) => {
-  const data = getData(filePath);
+export default (dataText, filePath) => {
   const type = path.extname(filePath).slice(1);
-  return parse(type, data);
+  return parse(type, dataText);
 };

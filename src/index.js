@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import fs from 'fs';
 import parse from './parsers';
 import deeper from './formatters/deeper';
 import plain from './formatters/plain';
@@ -49,8 +50,9 @@ const statuses = [
 const getProperties = (before, after, key) => statuses
   .find(({ check }) => check(before, after, key));
 export default (filePath1, filePath2, format = 'deep') => {
-  const objBefore = parse(filePath1);
-  const objAfter = parse(filePath2);
+  const getText = (filePath) => fs.readFileSync(filePath, 'utf8');
+  const objBefore = parse(getText(filePath1), filePath1);
+  const objAfter = parse(getText(filePath2), filePath2);
   const iter = (before, after) => {
     const allKeys = _.union(Object.keys(before), Object.keys(after));
     const ast = allKeys.map((key) => {
@@ -63,7 +65,7 @@ export default (filePath1, filePath2, format = 'deep') => {
         children: current.getChildren(before[key], after[key], iter),
       };
       return itemAst;
-    }, []);
+    });
     return ast;
   };
   const resultAst = iter(objBefore, objAfter);
