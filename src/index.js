@@ -2,14 +2,8 @@ import _ from 'lodash';
 import fs from 'fs';
 import path from 'path';
 import parse from './parsers';
-import deeper from './formatters/deeper';
-import plain from './formatters/plain';
+import render from './formatters/index';
 
-const renderer = {
-  deep: deeper,
-  plain,
-  json: JSON.stringify,
-};
 const isObject = (item) => item instanceof Object;
 const statuses = [
   {
@@ -73,5 +67,5 @@ export default (filePath1, filePath2, format = 'deep') => {
   const resultAst = iter(objBefore, objAfter);
   // console.log(JSON.stringify(resultAst, null, 2));
   // console.log(renderer[format](resultAst));
-  return renderer[format](resultAst);
+  return render(format, resultAst);
 };
