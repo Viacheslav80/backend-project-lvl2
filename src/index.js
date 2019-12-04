@@ -4,42 +4,31 @@ import path from 'path';
 import parse from './parsers';
 import render from './formatters/index';
 
-const isObject = (item) => item instanceof Object;
 const statuses = [
   {
     check: (before, after, key) => !(_.has(after, key)),
     status: 'deleted',
-    getChildren: () => [],
-    getValue: _.identity,
-    getNewValue: () => '',
+    process: () => ({ newValue: '' }),
   },
   {
-    check: (before, after, key) => (isObject(before[key]) && isObject(after[key])),
+    check: (before, after, key) => (_.isObject(before[key]) && _.isObject(after[key])),
     status: 'haveChildren',
-    getChildren: (before, after, func) => func(before, after),
-    getValue: _.identity,
-    getNewValue: _.identity,
+    process: (before, after, func) => ({ children: func(before, after) }),
   },
   {
     check: (before, after, key) => before[key] === after[key],
     status: 'no_changed',
-    getChildren: () => [],
-    getValue: _.identity,
-    getNewValue: () => '',
+    process: () => ({}),
   },
   {
     check: (before, after, key) => !(_.has(before, key)),
     status: 'add',
-    getChildren: () => [],
-    getValue: (before, after) => after,
-    getNewValue: () => '',
+    process: () => ({ oldValue: '' }),
   },
   {
     check: (before, after, key) => before[key] !== after[key],
     status: 'changed',
-    getChildren: () => [],
-    getValue: _.identity,
-    getNewValue: _.identity,
+    process: () => ({}),
   },
 ];
 const getProperties = (before, after, key) => statuses
@@ -52,15 +41,16 @@ export default (filePath1, filePath2, format = 'deep') => {
   const iter = (before, after) => {
     const allKeys = _.union(Object.keys(before), Object.keys(after));
     const ast = allKeys.map((key) => {
-      const current = getProperties(before, after, key);
+      const { status, process } = getProperties(before, after, key);
       const itemAst = {
         name: key,
-        status: current.status,
-        oldValue: current.getValue(before[key], after[key]),
-        newValue: current.getNewValue(after[key]),
-        children: current.getChildren(before[key], after[key], iter),
+        status,
+        oldValue: before[key],
+        newValue: after[key],
+        children: [],
       };
-      return itemAst;
+      const changeItem = process(before[key], after[key], iter);
+      return { ...itemAst, ...changeItem };
     });
     return ast;
   };
