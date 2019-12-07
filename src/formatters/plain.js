@@ -1,6 +1,6 @@
 const isObject = (value) => value instanceof Object;
 const statuses = {
-  add: (name, value, newValue) => `Property '${name}' was added with value: ${newValue}`,
+  added: (name, value, newValue) => `Property '${name}' was added with value: ${newValue}`,
   changed: (name, value, newValue) => `Property '${name}' was updated. From ${value} to ${newValue}`,
   deleted: (name) => `Property '${name}' was removed`,
   no_changed: () => '',

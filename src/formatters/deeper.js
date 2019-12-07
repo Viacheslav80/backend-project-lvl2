@@ -6,7 +6,7 @@ const stringify = (objToString, level = 1) => {
   return `{${objectToString}\n${' '.repeat(4 * (level + 1))}}`;
 };
 const statuses = {
-  add: (name, oldValue, newValue) => `  + ${name}: ${newValue}`,
+  added: (name, oldValue, newValue) => `  + ${name}: ${newValue}`,
   changed: (name, oldValue, newValue, level) => `  - ${name}: ${oldValue}\n${' '
     .repeat(4 * level)}  + ${name}: ${newValue}`,
   no_changed: (name, oldValue) => `    ${name}: ${oldValue}`,
