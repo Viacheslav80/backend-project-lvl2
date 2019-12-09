@@ -53,6 +53,6 @@ export default (filePath1, filePath2, format = 'deep') => {
   const objAfter = parse(getText(filePath2), getType(filePath2));
   const resultAst = buildAst(objBefore, objAfter);
   // console.log(JSON.stringify(resultAst, null, 2));
-  // console.log(renderer[format](resultAst));
+  console.log(render(format, resultAst));
   return render(format, resultAst);
 };

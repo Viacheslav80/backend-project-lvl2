@@ -1,9 +1,13 @@
 import _ from 'lodash';
 
-const stringify = (objToString, level = 1) => {
-  const objectToString = Object.entries(objToString)
-    .reduce((acc, [key, value]) => `${acc}\n${' '.repeat(4 * (level + 1))}    ${key}: ${value}`, '');
-  return `{${objectToString}\n${' '.repeat(4 * (level + 1))}}`;
+const getIndent = (level) => ' '.repeat(4 * level);
+const stringify = (inputValue, level = 1) => {
+  if (!(_.isObject(inputValue))) {
+    return inputValue;
+  }
+  const objectToString = Object.entries(inputValue)
+    .map(([key, value]) => `${getIndent(level + 1)}    ${key}: ${value}`).join('\n');
+  return `{\n${objectToString}\n${getIndent(level + 1)}}`;
 };
 const statuses = {
   added: (name, oldValue, newValue) => `  + ${name}: ${newValue}`,
@@ -15,17 +19,17 @@ const statuses = {
 };
 
 export default (ast) => {
-  const iter = (treeAst, level = 0) => {
-    const resultString = treeAst.reduce((acc, itemAst) => {
+  const render = (treeAst, level = 0) => {
+    const resultString = treeAst.map((itemAst) => {
       const {
         name, status, oldValue, newValue, children,
       } = itemAst;
-      const oldValue1 = _.isObject(oldValue) ? stringify(oldValue, level) : oldValue;
-      const newValue1 = _.isObject(newValue) ? stringify(newValue, level) : newValue;
-      const string = statuses[status](name, oldValue1, newValue1, level, iter, children);
-      return `${acc}\n${' '.repeat(4 * level)}${string}`;
-    }, '');
-    return `{${resultString}\n${' '.repeat(4 * (level))}}`;
+      const oldValue1 = stringify(oldValue, level);
+      const newValue1 = stringify(newValue, level);
+      const string = statuses[status](name, oldValue1, newValue1, level, render, children);
+      return `${getIndent(level)}${string}`;
+    }).join('\n');
+    return `{\n${resultString}\n${getIndent(level)}}`;
   };
-  return iter(ast);
+  return render(ast);
 };
